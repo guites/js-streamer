@@ -11,54 +11,6 @@
     <video controls="true" src="http://localhost:3000/stream"></video>
     <video controls="true" src="https://i.imgur.com/53PdaXU.mp4"></video>
     <video id="alt-video" controls="true"></video>
-    <script>
-        var hasFetchedSecondTime = false;
-      var video = document.getElementById('alt-video');
-
-      var assetURL = 'http://localhost:3000/altstream';
-      // Need to be specific for Blink regarding codecs
-      // ./mp4info frag_bunny.mp4 | grep Codec
-      var mimeCodec = 'video/mp4; codecs=avc1.4D002A,mp4a.40.2';
-
-      if ('MediaSource' in window && MediaSource.isTypeSupported(mimeCodec)) {
-        var mediaSource = new MediaSource;
-        //console.log(mediaSource.readyState); // closed
-        video.src = URL.createObjectURL(mediaSource);
-        mediaSource.addEventListener('sourceopen', sourceOpen);
-      } else {
-        console.error('Unsupported MIME type or codec: ', mimeCodec);
-      }
-
-      function sourceOpen (_) {
-        var mediaSource = this;
-        var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec)
-        fetchAB(assetURL, function (buf) {
-          sourceBuffer.addEventListener('updateend', function (_) {
-            mediaSource.endOfStream();
-            video.addEventListener('timeupdate', function() {
-                if (video.currentTime > 1 && !hasFetchedSecondTime) {
-                    hasFetchedSecondTime = true;
-                    fetchAB('http://localhost:3000/altstream2', function(beef) {
-                        sourceBuffer.appendBuffer(beef);
-                    })
-                }
-            });
-          });
-          sourceBuffer.appendBuffer(buf);
-        });
-      };
-
-      function fetchAB (url, cb) {
-        console.log(url);
-        var xhr = new XMLHttpRequest;
-        xhr.open('get', url);
-        xhr.responseType = 'arraybuffer';
-        xhr.onload = function () {
-          cb(xhr.response);
-        };
-        xhr.send();
-      };
-    
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
